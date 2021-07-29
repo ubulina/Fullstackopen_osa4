@@ -130,14 +130,6 @@ describe('when there is initially some blogs saved', () => {
                   
             }
 
-            const newBlog = {
-                title: newBlogWithoutLikes.title,
-                author: newBlogWithoutLikes.author,
-                url: newBlogWithoutLikes.url,
-                likes: 0
-                
-            }
-
             const response = await api
                 .post('/api/login')
                 .send({ "username": "ajuu", "password": "Jumpukka" })
@@ -147,12 +139,13 @@ describe('when there is initially some blogs saved', () => {
             await api
                 .post('/api/blogs')
                 .set('Authorization', `bearer ${token}`)
-                .send(newBlog)
+                .send(newBlogWithoutLikes)
                 .expect(201)
                 .expect('Content-Type', /application\/json/)
 
             const blogsAtEnd = await helper.blogsInDb()
-            expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1) 
+
+            expect(blogsAtEnd[3].likes).toBe(0)
 
         })
 

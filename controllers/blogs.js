@@ -1,8 +1,6 @@
 const blogRouter = require('express').Router()
 const middleware = require('../utils/middleware')
 const Blog = require('../models/blog')
-//const User = require('../models/user')
-//const jwt = require('jsonwebtoken')
 
 
 //kaikki määriteltävät routet liitetään router-olioon
@@ -32,6 +30,10 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
       
     })
 
+    if(!blog.likes) {
+      blog.likes = 0
+    }
+
     if (blog.title === undefined) {
         
       return response.status(400).json()
@@ -39,6 +41,12 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
     } else if (blog.url === undefined) {
         
         return response.status(400).json()
+
+    /* vaihtoehtoinen toteutus edelliselle:
+    if (!blog.url || !blog.title) {
+    return response.status(400).send({ error: 'title or url missing ' })
+    }
+    */  
 
     } else {
 
@@ -90,20 +98,21 @@ blogRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
 
 blogRouter.put('/:id', async (request, response) => {
 
-    const body = request.body
+    const oldBlog = await Blog.findById(request.params.id)
 
     const blog = {
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes
+
+      title: oldBlog.title,
+      author: oldBlog.author,
+      url: oldBlog.url,
+      likes: oldBlog.likes + 1
     }
 
     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
 
     //console.log(updatedBlog.toJSON)
 
-    response.status(200).json(updatedBlog.toJSON)
+    response.status(200).json(updatedBlog.toJSON())
 })
 
 module.exports = blogRouter

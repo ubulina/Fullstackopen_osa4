@@ -42,6 +42,12 @@ app.use('/api/users', usersRouter)
 
 app.use('/api/login', loginRouter)
 
+//testirouter lisätään mukaan vain, jos sovellusta suoritetaan test-moodissa
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
+
 //sijoitetaan vasta router-määrittelyn jälkeen ja 
 //toiseksiviimeiseksi ennen virheidenkäsittelijää
 app.use(middleware.unknownEndpoint)
