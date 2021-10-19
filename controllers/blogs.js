@@ -62,6 +62,35 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
 
 })
 
+//Tässä talletetaan kommentit tietokantaan 
+blogRouter.post('/:id/comments', async (request, response) => {
+
+  const body = request.body
+
+  const newComment = body.comments
+
+  console.log(body)
+
+  console.log(newComment)
+
+  const oldBlog = await Blog.findById(request.params.id)
+  
+  const blog = {
+
+    title: oldBlog.title,
+    author: oldBlog.author,
+    url: oldBlog.url,
+    likes: oldBlog.likes,
+    comments: oldBlog.comments.concat(newComment) 
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
+
+  response.status(200).json(updatedBlog.toJSON())
+
+
+})
+
 /*
 
 blogRouter.delete('/:id', async (request, response) => {
